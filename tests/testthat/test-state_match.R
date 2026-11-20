@@ -32,7 +32,8 @@ test_that("ambiguous or hopeless input returns NA", {
   expect_true(is.na(state_abb("")))
   expect_true(is.na(state_abb(NA)))
   expect_true(is.na(state_abb("Mis")))
-  expect_equal(state_match("New")$method, "ambiguous")
+  expect_equal(state_match("Mis")$method, "ambiguous")
+  expect_equal(state_match("New")$method, "none")
 })
 
 test_that("common 3-letter and traditional abbreviations match", {
@@ -45,6 +46,16 @@ test_that("common 3-letter and traditional abbreviations match", {
   expect_equal(state_match("ida")$method, "prefix")
   expect_equal(state_abb("ida"), "ID")
   expect_true(is.na(state_abb("ida", prefix = FALSE, fuzzy = FALSE)))
+})
+
+test_that("regressions: partial words and abbreviation lookalikes don't match", {
+  # "west" is the first word of West Virginia, not a state
+  expect_true(is.na(state_abb("west")))
+  expect_true(is.na(state_abb(c("north", "south", "new", "rhode"))[1]))
+  # "Kano" is 1 edit from the abbreviation "kans", but not a Kansas typo
+  expect_true(is.na(state_abb("Kano")))
+  expect_equal(state_abb(c("Kansa", "Kanasas", "W Virginia")),
+               c("KS", "KS", "WV"))
 })
 
 test_that("prefix shorthand and punctuation are handled", {

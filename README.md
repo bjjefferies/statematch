@@ -24,7 +24,7 @@ state_name("wi"); state_fips("DC")
 4. Fuzzy match with a transposition-aware edit distance. Allowed edits scale
    with name length (`max_dist`, default 0.25).
 
-Guard rails: if a prefix fits several states (`"Mis"`, `"New"`) the result is
+Guard rails: if a prefix fits several states (`"Mis"`) the result is
 `NA` with `method = "ambiguous"`; inputs under 4 characters are never fuzzy
 matched; two-letter codes are never "corrected". Use `state_match()` to audit
 `method` and `distance`, and review anything that is not `"exact"` or

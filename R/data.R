@@ -54,5 +54,9 @@
             "IN", "KS", "KS", "MA", "MI", "MN", "MS", "MT",
             "NE", "NE", "NV", "OK", "OR", "PA", "PA", "TN",
             "TX", "WA", "WI", "WI", "WY", "OR", "DE"),
+  # Only the descriptive aliases are fuzzy-match candidates. Short traditional
+  # abbreviations ("kans", "tex") would otherwise attract unrelated words,
+  # e.g. "Kano" -> "kans" -> Kansas.
+  fuzzy = c(rep(TRUE, 12), rep(FALSE, 31)),
   stringsAsFactors = FALSE
 )

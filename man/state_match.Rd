@@ -72,8 +72,11 @@ abbreviations such as \code{"Calif"}, \code{"Ariz"}, \code{"Penn"}, \code{"Tenn"
 }
 
 Matching is deliberately conservative. A prefix or fuzzy value is only
-matched when exactly one state fits; if several do (for example \code{"Mis"}
-\code{"New"} or \code{"Nor"}) the result is \code{NA} with \code{method = "ambiguous"}. Words that match no state, like \code{"Carolina"}, return \code{NA} with \code{method = "none"}.
+matched when exactly one state fits; if several do (for example \code{"Mis"},
+which could be Mississippi or Missouri) the result is \code{NA} with
+\code{method = "ambiguous"}. Words that match no single state, like \code{"Carolina"},
+\code{"West"} or \code{"New"}, return \code{NA} with \code{method = "none"}: a one-word input is
+never a prefix of a multi-word name.
 Inputs shorter than four characters are never fuzzy matched, and two-letter
 abbreviations are never "corrected".
 }

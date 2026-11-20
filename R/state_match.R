@@ -17,8 +17,11 @@
 #' 4. Fuzzy match using a transposition-aware edit distance, for misspellings.
 #'
 #' Matching is deliberately conservative. A prefix or fuzzy value is only
-#' matched when exactly one state fits; if several do (for example `"Mis"`
-#' `"New"` or `"Nor"`) the result is `NA` with `method = "ambiguous"`. Words that match no state, like `"Carolina"`, return `NA` with `method = "none"`.
+#' matched when exactly one state fits; if several do (for example `"Mis"`,
+#' which could be Mississippi or Missouri) the result is `NA` with
+#' `method = "ambiguous"`. Words that match no single state, like `"Carolina"`,
+#' `"West"` or `"New"`, return `NA` with `method = "none"`: a one-word input is
+#' never a prefix of a multi-word name.
 #' Inputs shorter than four characters are never fuzzy matched, and two-letter
 #' abbreviations are never "corrected".
 #'
@@ -154,17 +157,22 @@ state_fips <- function(x, ...) state_match(x, ...)$fips
   # 2. exact full name or alias
   cand_key <- c(tolower(tbl$name), .aliases$alias)
   cand_abb <- c(tbl$abb, .aliases$abb)
+  cand_fuzzy <- c(rep(TRUE, nrow(tbl)), .aliases$fuzzy)
   keep <- cand_abb %in% tbl$abb          # drop aliases for excluded states
   cand_key <- cand_key[keep]
   cand_key <- .normalize(cand_key)
   cand_abb <- cand_abb[keep]
+  cand_fuzzy <- cand_fuzzy[keep]
   hit <- match(key, cand_key)
   if (!is.na(hit)) return(.result(cand_abb[hit], "exact", 0))
 
   # 3. unique prefix of a state name ("cal", "tex", "n car")
   if (prefix && nchar(key) >= min_prefix) {
     full <- .normalize(tbl$name)
-    pre <- which(startsWith(full, key))
+    # A one-word input can't be a prefix of a multi-word name: "west" must not
+    # become West Virginia. "n car" or "w virg" (2+ words) still can.
+    eligible <- !grepl(" ", full, fixed = TRUE) | grepl(" ", key, fixed = TRUE)
+    pre <- which(startsWith(full, key) & eligible)
     if (length(pre) == 1L) return(.result(tbl$abb[pre], "prefix", 0))
     if (length(pre) > 1L) return(.result(NA_character_, "ambiguous", NA_real_))
   }
@@ -174,7 +182,7 @@ state_fips <- function(x, ...) state_match(x, ...)$fips
     return(.result(NA_character_, "none", NA_real_))
   }
   allowed <- floor(max_dist * nchar(cand_key))
-  near <- which(abs(nchar(cand_key) - nchar(key)) <= allowed)
+  near <- which(cand_fuzzy & abs(nchar(cand_key) - nchar(key)) <= allowed)
   if (!length(near)) return(.result(NA_character_, "none", NA_real_))
   dist <- vapply(near, function(i) .osa(key, cand_key[i]), numeric(1))
   ok <- dist <= allowed[near]
