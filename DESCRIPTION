@@ -1,0 +1,18 @@
+Package: statematch
+Type: Package
+Title: Match Messy US State Names and Abbreviations
+Version: 0.1.0
+Authors@R: person("Ben", "Jefferies", email = "bjjefferies@gmail.com", role = c("aut", "cre"))
+Description: Converts free-text US state names, postal abbreviations and common
+    variants (for example "N. Dakota", "Washington D.C.") to standard state
+    abbreviations, full names and FIPS codes. Small misspellings such as
+    "Tenessee" or "Pennsylvnaia" are corrected with a transposition-aware edit
+    distance, and ambiguous input (for example "Mis") is returned as
+    missing rather than guessed. Written in base R with no dependencies.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Depends: R (>= 3.5.0)
+Suggests: testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.1
